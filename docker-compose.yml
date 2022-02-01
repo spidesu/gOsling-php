@@ -4,7 +4,7 @@ services:
     image: "mariadb:10.7"
     env_file:
       - main.env
-  gOsling:
+  gosling:
     build: .
     env_file:
       - main.env
