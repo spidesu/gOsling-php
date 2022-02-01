@@ -10,6 +10,7 @@ class Config extends Singleton {
 	private string $mysql_password;
 	private string $default_language;
 	private array $translation;
+	private string $discord_bot_token;
 
 	public function __construct() {
 
@@ -23,6 +24,7 @@ class Config extends Singleton {
 		$this->mysql_username = $config["mysql-username"];
 		$this->mysql_password = $config["mysql-password"];
 		$this->default_language = $config["default-language"];
+		$this->discord_bot_token = $config["discord-bot-token"];
 
 		$translation_string = file_get_contents(APP_DIR . "/conf/translation.json");
 		$this->translation = json_decode($translation_string, true);
@@ -56,6 +58,11 @@ class Config extends Singleton {
 	public function getTranslation():array {
 
 		return $this->translation;
+	}
+
+	public function getDiscordBotToken():array {
+
+		return $this->discord_bot_token;
 	}
 
 }

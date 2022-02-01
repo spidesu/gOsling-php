@@ -10,7 +10,7 @@ include __DIR__ . "/vendor/autoload.php";
 const APP_DIR = __DIR__ ;
 
 $discord = new Discord([
-	'token' => 'NjcwMzE0NTQ4ODU0Nzg0MDAw.XislEg.yWvjHi5xjFXcurmLzHcwif6Vtyk',
+	'token' => \Spidesu\Gosling\System\Config::instance()->getDiscordBotToken(),
 	'intents' => Intents::getDefaultIntents() | Intents::GUILD_MEMBERS,
 	'loadAllMembers' => true,
 	'pmChannels' => false,
