@@ -60,7 +60,7 @@ class Config extends Singleton {
 		return $this->translation;
 	}
 
-	public function getDiscordBotToken():array {
+	public function getDiscordBotToken():string {
 
 		return $this->discord_bot_token;
 	}
