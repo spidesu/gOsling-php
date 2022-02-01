@@ -1,0 +1,20 @@
+{
+    "name": "spidesu/gosling",
+    "description": "discrod bot fowls",
+    "type": "project",
+    "require": {
+        "team-reflex/discord-php": "^6.0",
+        "ext-pdo": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spidesu\\Gosling\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Mikhail F",
+            "email": "fedomikhail@gmail.com"
+        }
+    ]
+}

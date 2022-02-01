@@ -1,0 +1,6 @@
+{
+	"birthday" : {
+		"ru" : "add <dd.mm> - добавить день рождения участника сервера\nshow <username> - показать день рождения у человека",
+		"en" : "add <dd.mm> - add guild member birthday\nshow - show birthday list"
+	}
+}
