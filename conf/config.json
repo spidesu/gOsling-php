@@ -1,8 +1,0 @@
-{
-	"default-language": "${DEFAULT_LANGUAGE}",
-	"mysql-host": "${MYSQL_HOST}",
-	"mysql-port": "${MYSQL_PORT}",
-	"mysql-username": "${MYSQL_USERNAME}",
-	"mysql-password": "${MYSQL_PASSWORD}",
-	"discord-bot-token": "${DISCORD_BOT_TOKEN}"
-}

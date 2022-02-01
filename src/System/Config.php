@@ -4,10 +4,10 @@ namespace Spidesu\Gosling\System;
 
 class Config extends Singleton {
 
-	private string $mysql_host;
-	private int $mysql_port;
-	private string $mysql_username;
-	private string $mysql_password;
+	private string $db_host;
+	private int $db_port;
+	private string $db_username;
+	private string $db_password;
 	private string $default_language;
 	private array $translation;
 	private string $discord_bot_token;
@@ -19,10 +19,10 @@ class Config extends Singleton {
 		$config_string = file_get_contents(APP_DIR . "/conf/config.json");
 		$config = json_decode($config_string, true);
 
-		$this->mysql_host = $config["mysql-host"];
-		$this->mysql_port = $config["mysql-port"];
-		$this->mysql_username = $config["mysql-username"];
-		$this->mysql_password = $config["mysql-password"];
+		$this->db_host = $config["db-host"];
+		$this->db_port = $config["db-port"];
+		$this->db_username = $config["db-username"];
+		$this->db_password = $config["db-password"];
 		$this->default_language = $config["default-language"];
 		$this->discord_bot_token = $config["discord-bot-token"];
 
@@ -30,24 +30,24 @@ class Config extends Singleton {
 		$this->translation = json_decode($translation_string, true);
 	}
 
-	public function getMysqlHost():string {
+	public function getDbHost():string {
 
-		return $this->mysql_host;
+		return $this->db_host;
 	}
 
-	public function getMysqlPort():string {
+	public function getDbPort():string {
 
-		return $this->mysql_port;
+		return $this->db_port;
 	}
 
-	public function getMysqlUsername():string {
+	public function getDbUsername():string {
 
-		return $this->mysql_username;
+		return $this->db_username;
 	}
 
-	public function getMysqlPassword():string {
+	public function getDbPassword():string {
 
-		return $this->mysql_password;
+		return $this->db_password;
 	}
 
 	public function getDefaultLanguage():string {

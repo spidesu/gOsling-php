@@ -7,7 +7,7 @@ use Spidesu\Gosling\Exception\RowIsEmpty;
 use Spidesu\Gosling\Model\Birthday;
 use Spidesu\Gosling\System\PDO\PDOConnector;
 
-const DB_NAME = "gOsling";
+const DB_NAME = "main";
 
 class BirthdayRepository {
 

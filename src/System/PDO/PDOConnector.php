@@ -24,11 +24,11 @@ class PDOConnector extends Singleton {
 			try {
 				$this->db_list[$db_name]->query('SELECT 1');
 			} catch (PDOException) {
-				$this->db_list[$db_name] = new PDOMain("mysql:host={$config->getMysqlHost()}:{$config->getMysqlPort()};dbname=$db_name", $config->getMysqlUsername(), $config->getMysqlPassword());
+				$this->db_list[$db_name] = new PDOMain("mysql:host={$config->getDbHost()}:{$config->getDbPort()};dbname=$db_name", $config->getDbUsername(), $config->getDbPassword());
 			}
 			return $this->db_list[$db_name];
 		}
 
-		return $this->db_list[$db_name] = new PDOMain("mysql:host={$config->getMysqlHost()}:{$config->getMysqlPort()};dbname=$db_name", $config->getMysqlUsername(), $config->getMysqlPassword());
+		return $this->db_list[$db_name] = new PDOMain("mysql:host={$config->getDbHost()}:{$config->getDbPort()};dbname=$db_name", $config->getDbUsername(), $config->getDbPassword());
 	}
 }
