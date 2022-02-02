@@ -4,6 +4,8 @@ services:
     image: "mariadb:10.7"
     env_file:
       - main.env
+    volumes:
+      - /db:/var/lib/mysql
   gosling:
     build: .
     env_file:
