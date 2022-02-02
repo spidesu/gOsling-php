@@ -34,12 +34,15 @@ class BirthdayRepository {
 	public static function insertOrUpdate(Birthday $birthday):bool {
 
 		return PDOConnector::instance()->connect(DB_NAME)->insert(
-			"INSERT INTO `birthdays` VALUES(:user_id, :guild_id, :month, :day) ON DUPLICATE KEY UPDATE `month` = :month, `day` = :day",
+			"INSERT INTO `birthdays` VALUES(:user_id, :guild_id, :month, :day, :created_at, :updated_at) 
+				ON DUPLICATE KEY UPDATE `month` = :month, `day` = :day, `updated_at` = :updated_at",
 			[
-				":user_id"  => $birthday->user_id,
-				":guild_id" => $birthday->guild_id,
-				":month"    => $birthday->month,
-				":day"      => $birthday->day,
+				":user_id"    => $birthday->user_id,
+				":guild_id"   => $birthday->guild_id,
+				":month"      => $birthday->month,
+				":day"        => $birthday->day,
+				":created_at" => time(),
+				":updated_at" => time(),
 			]
 		);
 	}
