@@ -29,7 +29,7 @@ abstract class Controller extends Singleton {
 		if (in_array($method, $this->_protected_method_list)) {
 
 			// проверяем, что пользователь админ, и выполняем метод
-			if ($message->author->getPermissions()->manage_roles) {
+			if ($message->member->getPermissions()->manage_roles) {
 
 				$this->$method($message, $discord, $args);
 				return;
