@@ -131,7 +131,7 @@ class BirthdayController extends Controller {
 		$need_work_date->setDate((int)date("Y"), (int) $month, (int) $day);
 
 		$current_date = new \DateTime();
-		if ($current_date < $need_work_date) {
+		if (((int) $current_date->format('n') > $month) || ((int) $current_date->format('n') == $month && (int) $current_date->format('j') >= $day)) {
 			$need_work_at = $need_work_date->setTime(8,0)->getTimestamp();
 		} else {
 			$need_work_at = $current_date->setDate((int)date("Y") + 1, (int) $month, (int) $day)->setTime(8,0)->getTimestamp();

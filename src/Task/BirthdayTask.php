@@ -24,7 +24,7 @@ class BirthdayTask {
 			$message = "Поздравляем с днем рождения:\n";
 			try {
 
-				$task = BirthdayTaskRepository::get($guild_id, time());
+				$task = BirthdayTaskRepository::getByNeedWork($guild_id, time());
 				$guild_config = GuildRepository::get($guild_id);
 			} catch (RowIsEmpty) {
 				continue;
