@@ -4,13 +4,16 @@ namespace Spidesu\Gosling\Controller;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
-use Discord\Parts\Guild\Guild;
+use Discord\Parts\Guild\Role;
 use Discord\Parts\User\Member;
 use Spidesu\Gosling\Exception\DuplicateEntry;
 use Spidesu\Gosling\Exception\IncorrectBirthday;
 use Spidesu\Gosling\Exception\RowIsEmpty;
 use Spidesu\Gosling\Model\Birthday;
+use Spidesu\Gosling\Model\BirthdayTask;
 use Spidesu\Gosling\Repository\BirthdayRepository;
+use Spidesu\Gosling\Repository\BirthdayTaskRepository;
+use Spidesu\Gosling\Repository\GuildRepository;
 use Spidesu\Gosling\System\Config;
 
 class BirthdayController extends Controller {
@@ -22,14 +25,34 @@ class BirthdayController extends Controller {
 	protected array $_protected_method_list = [
 		"show",
 		"add",
+		"channel",
+		"role",
 	];
 
+	/**
+	 * Дефолтное действие
+	 *
+	 * @param Message $message
+	 * @param Discord $discord
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function default(Message $message, Discord $discord):void {
 
 		$this->help($message, $discord);
 
 	}
 
+	/**
+	 * Показать день рождения для пользователя
+	 * @param Message $message
+	 * @param Discord $discord
+	 * @param array   $args
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function show(Message $message, Discord $discord, array $args):void {
 
 		if (count($args) < 1) {
@@ -40,7 +63,7 @@ class BirthdayController extends Controller {
 
 		$username = $args[0];
 
-		$guild = $discord->guilds->pull($message->guild_id);
+		$guild = $message->channel->guild;
 
 		$member = $guild->members->find(function (Member $member) use ($username)  {
 			return $member->username === $username;
@@ -53,16 +76,27 @@ class BirthdayController extends Controller {
 		}
 
 		try {
-			$birthday = BirthdayRepository::get($member->id);
+			$birthday = BirthdayRepository::get($member->id, $guild->id);
 		} catch (RowIsEmpty) {
 			$message->channel->sendMessage("Для пользователя не добавлен день рождения");
 			return;
 		}
 
+		$day = sprintf("%02d", $birthday->day);
+		$month = sprintf("%02d", $birthday->month);
 
-		$message->channel->sendMessage("У {$username} день рождения {$birthday->day}.{$birthday->month}");
+		$message->channel->sendMessage("У {$username} день рождения {$day}.{$month}");
 	}
 
+	/**
+	 * Добавить день рождения
+	 * @param Message $message
+	 * @param Discord $discord
+	 * @param array   $args
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function add(Message $message, Discord $discord, array $args):void {
 
 		if (count($args) < 1) {
@@ -90,12 +124,35 @@ class BirthdayController extends Controller {
 			$message->channel->sendMessage("Передан неверный формат даты");
 			return;
 		}
-		try {
-			BirthdayRepository::insertOrUpdate(new Birthday($member->id, $message->guild_id, $month, $day));
-		} catch (DuplicateEntry) {
-			$message->channel->sendMessage("Дата для пользователя уже добавлена");
-			return;
+
+		BirthdayRepository::insertOrUpdate(new Birthday($member->id, $message->guild_id, $month, $day));
+
+		$need_work_date = new \DateTime();
+		$need_work_date->setDate((int)date("Y"), (int) $month, (int) $day);
+
+		$current_date = new \DateTime();
+		if ($current_date < $need_work_date) {
+			$need_work_at = $need_work_date->setTime(8,0)->getTimestamp();
+		} else {
+			$need_work_at = $current_date->setDate((int)date("Y") + 1, (int) $month, (int) $day)->setTime(8,0)->getTimestamp();
 		}
+
+		try {
+			BirthdayTaskRepository::insert(
+				new BirthdayTask(
+					$month,
+					$day,
+					$message->guild_id,
+					$need_work_at,
+					[$member->id]
+				)
+			);
+		} catch (DuplicateEntry) {
+			BirthdayTaskRepository::addToUserList($member->id, $message->guild_id, $month, $day);
+		}
+
+
+
 
 		$message->channel->sendMessage("Дата рождения добавлена/изменена");
 	}
@@ -139,11 +196,52 @@ class BirthdayController extends Controller {
 	}
 
 	/**
+	 * Установить канал для поздравлений
+	 *
+	 * @param Message $message
+	 * @param Discord $discord
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
+	public function channel(Message $message, Discord $discord):void {
+
+		GuildRepository::setBirthdayChannel($message->channel_id, $message->guild_id);
+		$message->channel->sendMessage("Текущий канал добавлен для поздравлений");
+	}
+
+	public function role(Message $message, Discord $discord, array $args):void {
+
+		if (count($args) < 1) {
+
+			$message->channel->sendMessage("Не введены данные для добавления дня рождения");
+			return;
+		}
+
+		$role_name = $args[0];
+
+		$role = $message->channel->guild->roles->find(function (Role $role) use ($role_name)  {
+			return $role->name === $role_name;
+		});
+
+		if (!$role) {
+			$message->channel->sendMessage("Такой роли не существует");
+			return;
+		}
+
+		GuildRepository::setBirthdayRole($role->id, $message->guild_id);
+		$message->channel->sendMessage("Роль для поздравлений установлена");
+
+	}
+
+	/**
 	 * Помощь по команде
 	 *
 	 * @param Message $message
+	 * @param Discord $discord
 	 *
 	 * @return void
+	 * @throws \Exception
 	 */
 	public function help(Message $message, Discord $discord):void {
 

@@ -2,14 +2,15 @@
 
 namespace Spidesu\Gosling\Model;
 
-class Birthday {
+/**
+ *
+ */
+class Guild {
 
 	public function __construct(
-		public string $user_id,
 		public string $guild_id,
-		public int $month,
-		public int $day,
+		public string $birthday_role,
+		public string $birthday_channel,
 	) {
 	}
-
 }

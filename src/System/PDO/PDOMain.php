@@ -56,8 +56,13 @@ class PDOMain extends PDO {
 		return $stmt->execute($args);
 	}
 
-
 	public function insertOrUpdate(string $query, array $args):bool {
+
+		$stmt = $this->prepare($query);
+		return $stmt->execute($args);
+	}
+
+	public function delete(string $query, array $args):bool {
 
 		$stmt = $this->prepare($query);
 		return $stmt->execute($args);

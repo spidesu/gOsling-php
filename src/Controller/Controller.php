@@ -4,7 +4,6 @@ namespace Spidesu\Gosling\Controller;
 
 use Discord\Discord;
 use Discord\Parts\Channel\Message;
-use Discord\Parts\Guild\Role;
 use Spidesu\Gosling\System\Singleton;
 
 abstract class Controller extends Singleton {
@@ -14,7 +13,7 @@ abstract class Controller extends Singleton {
 
 	public function work(Message $message, Discord $discord, string|false $method = false, array $args = []):void {
 
-		if (!$method) {
+		if (!$method || !$message->guild_id) {
 			$this->default($message, $discord);
 			return;
 		}
