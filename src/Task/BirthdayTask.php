@@ -21,7 +21,7 @@ class BirthdayTask {
 
 		foreach($guild_id_list as $guild_id) {
 
-			$message = "Поздравляем с днем рождения:\n";
+			$message = "Поздравляем с днем рождения🎂". PHP_EOL;
 			try {
 
 				$task = BirthdayTaskRepository::getByNeedWork($guild_id, time());
@@ -39,7 +39,7 @@ class BirthdayTask {
 
 			foreach ($member_list as $member) {
 
-				$message.="{$member->username}\n";
+				$message.="{$member}". PHP_EOL;
 				if (strlen($guild_config->birthday_role) > 0) {
 					$member->addRole($guild_config->birthday_role);
 				}
