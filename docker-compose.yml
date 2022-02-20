@@ -8,5 +8,8 @@ services:
       - /db:/var/lib/mysql
   gosling:
     build: .
+    restart: always
+    depends_on:
+      - mariadb-host
     env_file:
       - main.env

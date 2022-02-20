@@ -12,6 +12,7 @@ class MessageCreateHandler {
 	 */
 	private static array $_command_list = [
 		"birthday" => BirthdayController::class,
+		"support"  => SupportRoleController::class,
 	];
 
 	/**

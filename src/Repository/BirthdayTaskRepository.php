@@ -28,15 +28,16 @@ class BirthdayTaskRepository {
 		return new BirthdayTask(
 			$result["month"],
 			$result["day"],
+			$result["type"],
 			$result["guild_id"],
 			$result["need_work_at"],
 			json_decode($result["user_list"], true),
 		);
 	}
 
-	public static function getByNeedWork(string $guild_id, int $need_work_at):BirthdayTask {
+	public static function getByNeedWork(string $guild_id, int $need_work_at):array {
 
-		$result = PDOConnector::instance()->connect(DB_NAME)->getOne(
+		$result = PDOConnector::instance()->connect(DB_NAME)->getAll(
 			"SELECT * FROM `birthday_tasks` WHERE `guild_id` = :guild_id AND `need_work_at` < :need_work_at",
 			[
 				":guild_id"     => $guild_id,
@@ -45,17 +46,20 @@ class BirthdayTaskRepository {
 
 		);
 
-		if (!isset($result["guild_id"])) {
-			throw new RowIsEmpty();
+		$output = [];
+
+		foreach ($result as $row) {
+			$output[] = new BirthdayTask(
+				$row["month"],
+				$row["day"],
+				$row["type"],
+				$row["guild_id"],
+				$row["need_work_at"],
+				json_decode($row["user_list"], true),
+			);
 		}
 
-		return new BirthdayTask(
-			$result["month"],
-			$result["day"],
-			$result["guild_id"],
-			$result["need_work_at"],
-			json_decode($result["user_list"], true),
-		);
+		return $output;
 	}
 
 	public static function insert(BirthdayTask $task):bool {
@@ -63,10 +67,11 @@ class BirthdayTaskRepository {
 		try {
 
 			return PDOConnector::instance()->connect(DB_NAME)->insert(
-				"INSERT INTO `birthday_tasks` VALUES(:month, :day, :guild_id, :need_work_at, :created_at, :updated_at, :user_list) ",
+				"INSERT INTO `birthday_tasks` VALUES(:month, :day, :type, :guild_id, :need_work_at, :created_at, :updated_at, :user_list) ",
 				[
 					":month"        => $task->month,
 					":day"          => $task->day,
+					":type"         => $task->type,
 					":guild_id"     => $task->guild_id,
 					":need_work_at" => $task->need_work_at,
 					":created_at"   => time(),
@@ -138,17 +143,19 @@ class BirthdayTaskRepository {
 	 * @param int    $month
 	 * @param int    $day
 	 * @param int    $need_work_at
+	 * @param int    $type
 	 *
 	 * @return bool
 	 */
-	public static function updateNeedWorkAt(string $guild_id, int $month, int $day, int $need_work_at):bool {
+	public static function updateNeedWorkAt(string $guild_id, int $month, int $day, int $need_work_at, int $type):bool {
 
 		return PDOConnector::instance()->connect(DB_NAME)->update(
-			"UPDATE `birthday_tasks` SET `need_work_at` = :need_work_at WHERE `month` = :month AND `day` = :day AND `guild_id` = :guild_id", [
+			"UPDATE `birthday_tasks` SET `need_work_at` = :need_work_at, `type` = :type WHERE `month` = :month AND `day` = :day AND `guild_id` = :guild_id", [
 				":month"        => $month,
 				":day"          => $day,
 				":guild_id"     => $guild_id,
 				":need_work_at" => $need_work_at,
+				":type"         => $type,
 			]
 		);
 	}

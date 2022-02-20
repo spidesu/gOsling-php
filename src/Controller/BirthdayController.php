@@ -132,28 +132,32 @@ class BirthdayController extends Controller {
 
 		$current_date = new \DateTime();
 		if (((int) $current_date->format('n') > $month) || ((int) $current_date->format('n') == $month && (int) $current_date->format('j') >= $day)) {
-			$need_work_at = $need_work_date->setTime(8,0)->getTimestamp();
+			$need_work_date = $need_work_date->setTime(8,0);
 		} else {
-			$need_work_at = $current_date->setDate((int)date("Y") + 1, (int) $month, (int) $day)->setTime(8,0)->getTimestamp();
+			$need_work_date = $current_date->setDate((int)date("Y") + 1, (int) $month, (int) $day)->setTime(8,0);
 		}
+
+		$need_work_at = $need_work_date->getTimestamp();
 
 		try {
 			BirthdayTaskRepository::insert(
 				new BirthdayTask(
 					$month,
 					$day,
+					BirthdayTask::CONGRATULATION_TYPE,
 					$message->guild_id,
 					$need_work_at,
-					[$member->id]
+					[$member->id],
+
 				)
 			);
 		} catch (DuplicateEntry) {
-			BirthdayTaskRepository::addToUserList($member->id, $message->guild_id, $month, $day);
+			$birthday_task = BirthdayTaskRepository::get($message->guild_id, $month, $day);
+
+			if (!in_array($member->id, $birthday_task->user_list)) {
+				BirthdayTaskRepository::addToUserList($member->id, $message->guild_id, $month, $day);
+			}
 		}
-
-
-
-
 		$message->channel->sendMessage("Дата рождения добавлена/изменена");
 	}
 
@@ -206,15 +210,25 @@ class BirthdayController extends Controller {
 	 */
 	public function channel(Message $message, Discord $discord):void {
 
-		GuildRepository::setBirthdayChannel($message->channel_id, $message->guild_id);
+		GuildRepository::setConfigValues($message->guild_id, ["birthday_channel" => $message->channel_id]);
 		$message->channel->sendMessage("Текущий канал добавлен для поздравлений");
 	}
 
+	/**
+	 * Установить роль для поздравлений
+	 *
+	 * @param Message $message
+	 * @param Discord $discord
+	 * @param array   $args
+	 *
+	 * @return void
+	 * @throws \Exception
+	 */
 	public function role(Message $message, Discord $discord, array $args):void {
 
 		if (count($args) < 1) {
 
-			$message->channel->sendMessage("Не введены данные для добавления дня рождения");
+			$message->channel->sendMessage("Не введена роль");
 			return;
 		}
 
@@ -229,7 +243,7 @@ class BirthdayController extends Controller {
 			return;
 		}
 
-		GuildRepository::setBirthdayRole($role->id, $message->guild_id);
+		GuildRepository::setConfigValues($message->guild_id, ["birthday_role" => $role->id]);
 		$message->channel->sendMessage("Роль для поздравлений установлена");
 
 	}

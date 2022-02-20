@@ -15,41 +15,37 @@ use Spidesu\Gosling\Repository\GuildRepository;
  */
 class BirthdayTask {
 
+	/**
+	 * Отправить сообщение о дней рождении
+	 *
+	 * @param Discord $discord
+	 *
+	 * @return void
+	 */
 	public static function sendBirthdayMessage(Discord $discord):void {
 
 		$guild_id_list = $discord->guilds->map(function (Guild $guild) {return $guild->id;});
 
 		foreach($guild_id_list as $guild_id) {
 
-			$message = "Поздравляем с днем рождения🎂". PHP_EOL;
 			try {
 
-				$task = BirthdayTaskRepository::getByNeedWork($guild_id, time());
+				$task_list = BirthdayTaskRepository::getByNeedWork($guild_id, time());
 				$guild_config = GuildRepository::get($guild_id);
 			} catch (RowIsEmpty) {
 				continue;
 			}
-			$user_list = $task->user_list;
 
-			$guild = $discord->guilds->get('id', $guild_id);
+			foreach ($task_list as $task) {
 
-			$member_list = $guild->members->filter(function (Member $member) use ($user_list) {
-				return in_array($member->id, $user_list);
-				});
+				if ($task->type == \Spidesu\Gosling\Model\BirthdayTask::CONGRATULATION_TYPE) {
+					self::_congratulateMembers($task, $discord, $guild_config);
+				}
 
-			foreach ($member_list as $member) {
-
-				$message.="{$member}". PHP_EOL;
-				if (strlen($guild_config->birthday_role) > 0) {
-					$member->addRole($guild_config->birthday_role);
+				if ($task->type == \Spidesu\Gosling\Model\BirthdayTask::REMOVE_ROLE_TYPE) {
+					self::_removeBirthdayRole($task, $discord, $guild_config);
 				}
 			}
-
-			$birthday_channel = $guild->channels->get('id', $guild_config->birthday_channel);
-			$birthday_channel?->sendMessage($message);;
-
-			$new_need_work_at = (new \DateTime())->setDate((int) date('Y') + 1, $task->month, $task->day)->setTime(8,0)->getTimestamp();
-			BirthdayTaskRepository::updateNeedWorkAt($guild_id, $task->month, $task->day, $new_need_work_at);
 		}
 	}
 
@@ -81,4 +77,70 @@ class BirthdayTask {
 		BirthdayTaskRepository::updateUserList($birthday_task->user_list, $member->guild_id, $birthday->month, $birthday->day);
 	}
 
+	/**
+	 * Поздравляем участников
+	 *
+	 * @param \Spidesu\Gosling\Model\BirthdayTask $task
+	 * @param Discord                             $discord
+	 * @param \Spidesu\Gosling\Model\Guild        $guild_config
+	 *
+	 * @return void
+	 */
+	private static function _congratulateMembers(\Spidesu\Gosling\Model\BirthdayTask $task, Discord $discord, \Spidesu\Gosling\Model\Guild $guild_config):void {
+
+		$message = "Поздравляем с днем рождения🎂". PHP_EOL;
+
+		$user_list = $task->user_list;
+
+		$guild = $discord->guilds->get('id', $task->guild_id);
+
+		$member_list = $guild->members->filter(function (Member $member) use ($user_list) {
+			return in_array($member->id, $user_list);
+		});
+
+		foreach ($member_list as $member) {
+
+			$message.="{$member}". PHP_EOL;
+			if (strlen($guild_config->config["birthday_role"]) > 0) {
+				$member->addRole($guild_config->config["birthday_role"]);
+			}
+		}
+
+		$birthday_channel = $guild->channels->get('id', $guild_config->config["birthday_channel"]);
+		$birthday_channel?->sendMessage($message);;
+
+		$new_need_work_at = (new \DateTime())->setDate((int) date('Y'), $task->month, $task->day + 1)->setTime(1,0)->getTimestamp();
+		BirthdayTaskRepository::updateNeedWorkAt($task->guild_id, $task->month, $task->day, $new_need_work_at, \Spidesu\Gosling\Model\BirthdayTask::REMOVE_ROLE_TYPE);
+
+	}
+
+	/**
+	 * На следующий день удаляем роль с поздравлением
+	 *
+	 * @param \Spidesu\Gosling\Model\BirthdayTask $task
+	 * @param Discord                             $discord
+	 * @param \Spidesu\Gosling\Model\Guild        $guild_config
+	 *
+	 * @return void
+	 */
+	private static function _removeBirthdayRole(\Spidesu\Gosling\Model\BirthdayTask $task, Discord $discord, \Spidesu\Gosling\Model\Guild $guild_config):void {
+
+		$user_list = $task->user_list;
+
+		$guild = $discord->guilds->get('id', $task->guild_id);
+
+		$member_list = $guild->members->filter(function (Member $member) use ($user_list) {
+			return in_array($member->id, $user_list);
+		});
+
+		foreach ($member_list as $member) {
+
+			if (strlen($guild_config->config["birthday_role"]) > 0) {
+				$member->removeRole($guild_config->config["birthday_role"]);
+			}
+		}
+
+		$new_need_work_at = (new \DateTime())->setDate((int) date('Y') + 1, $task->month, $task->day)->setTime(8,0)->getTimestamp();
+		BirthdayTaskRepository::updateNeedWorkAt($task->guild_id, $task->month, $task->day, $new_need_work_at, \Spidesu\Gosling\Model\BirthdayTask::CONGRATULATION_TYPE);
+	}
 }

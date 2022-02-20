@@ -9,6 +9,7 @@ use Discord\WebSockets\Event;
 use React\Promise\Promise;
 use Spidesu\Gosling\Controller\MessageCreateHandler;
 use Spidesu\Gosling\Task\BirthdayTask;
+use Spidesu\Gosling\Task\SupportRoleTask;
 
 include __DIR__ . "/vendor/autoload.php";
 const APP_DIR = __DIR__ ;
@@ -50,6 +51,18 @@ $discord->on(Event::MESSAGE_CREATE, function (Message $message, Discord $discord
 
 $discord->on(Event::GUILD_MEMBER_REMOVE, function (Member $member, Discord $discord) {
 	BirthdayTask::removeMemberFromBirthdays($member);
+});
+
+// действия при обновлении члена гильдии
+$discord->on(Event::GUILD_MEMBER_UPDATE, function (Member $new, Discord $discord, Member $old) {
+	$resolver = function (callable $resolve) use ($new, $discord, $old) {
+		$resolve(SupportRoleTask::setSupportRole($new, $discord, $old));
+	};
+	$promise = new Promise($resolver);
+	$promise->done(function (array $data) {
+		if ($data["process_time"] === 0) return;
+		echo "Support role add/remove for member {$data["member_id"]} in guild {$data["guild_id"]} processed successfully for {$data["process_time"]}ms". PHP_EOL;
+	});
 });
 
 $discord->getLoop()->addPeriodicTimer(3600, function () use($discord) { BirthdayTask::sendBirthdayMessage($discord);});

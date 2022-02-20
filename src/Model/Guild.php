@@ -9,8 +9,7 @@ class Guild {
 
 	public function __construct(
 		public string $guild_id,
-		public string $birthday_role,
-		public string $birthday_channel,
+		public array $config,
 	) {
 	}
 }
