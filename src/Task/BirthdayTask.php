@@ -109,7 +109,7 @@ class BirthdayTask {
 		$birthday_channel = $guild->channels->get('id', $guild_config->config["birthday_channel"]);
 		$birthday_channel?->sendMessage($message);;
 
-		$new_need_work_at = (new \DateTime())->setDate((int) date('Y'), $task->month, $task->day + 1)->setTime(1,0)->getTimestamp();
+		$new_need_work_at = (new \DateTime())->setDate((int) date('Y'), $task->month, $task->day + 1)->setTime(0,0)->getTimestamp();
 		BirthdayTaskRepository::updateNeedWorkAt($task->guild_id, $task->month, $task->day, $new_need_work_at, \Spidesu\Gosling\Model\BirthdayTask::REMOVE_ROLE_TYPE);
 
 	}
@@ -140,7 +140,7 @@ class BirthdayTask {
 			}
 		}
 
-		$new_need_work_at = (new \DateTime())->setDate((int) date('Y') + 1, $task->month, $task->day)->setTime(8,0)->getTimestamp();
+		$new_need_work_at = (new \DateTime())->setDate((int) date('Y') + 1, $task->month, $task->day)->setTime(5,0)->getTimestamp();
 		BirthdayTaskRepository::updateNeedWorkAt($task->guild_id, $task->month, $task->day, $new_need_work_at, \Spidesu\Gosling\Model\BirthdayTask::CONGRATULATION_TYPE);
 	}
 }

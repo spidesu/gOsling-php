@@ -10,6 +10,10 @@ use Spidesu\Gosling\System\Config;
 
 class SupportRoleController extends Controller {
 
+	protected array $_method_list = [
+		"help",
+	];
+
 	protected array $_protected_method_list = [
 		"role",
 	];
@@ -37,7 +41,7 @@ class SupportRoleController extends Controller {
 
 		$discord_role = $message->channel->guild->roles->get('id', $role_id);
 
-		if (!$discord_role ) {
+		if (!$discord_role) {
 			$message->channel->sendMessage("Введеная роль не является ролью Server Booster");
 			return;
 		}
