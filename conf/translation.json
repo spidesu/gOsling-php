@@ -1,7 +1,7 @@
 {
 	"birthday" : {
-		"ru" : "add <dd.mm> - добавить день рождения участника сервера\nshow <username> - показать день рождения у человека\nchannel - установить текущий канал для поздравлений\nrole <role name> - установить роль для поздравления",
-		"en" : "add <dd.mm> - add guild member birthday\nshow - show birthday list"
+		"ru" : "add <nick> <dd.mm> - добавить день рождения участника сервера\nshow <username> - показать день рождения у человека\nchannel - установить текущий канал для поздравлений\nrole <role name> - установить роль для поздравления",
+		"en" : "add <nick> <dd.mm> - add guild member birthday\nshow - show birthday list"
 	},
 
 	"support" : {
