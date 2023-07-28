@@ -12,7 +12,7 @@ class Config extends Singleton {
 	private array $translation;
 	private string $discord_bot_token;
 
-	public function __construct() {
+	protected function __construct() {
 
 		parent::__construct();
 

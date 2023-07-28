@@ -3,6 +3,7 @@
 namespace Spidesu\Gosling\Task;
 
 use Discord\Discord;
+use Discord\Http\Exceptions\NoPermissionsException;
 use Discord\Parts\Guild\Guild;
 use Discord\Parts\User\Member;
 use Spidesu\Gosling\Exception\RowIsEmpty;
@@ -77,15 +78,16 @@ class BirthdayTask {
 		BirthdayTaskRepository::updateUserList($birthday_task->user_list, $member->guild_id, $birthday->month, $birthday->day);
 	}
 
-	/**
-	 * Поздравляем участников
-	 *
-	 * @param \Spidesu\Gosling\Model\BirthdayTask $task
-	 * @param Discord                             $discord
-	 * @param \Spidesu\Gosling\Model\Guild        $guild_config
-	 *
-	 * @return void
-	 */
+    /**
+     * Поздравляем участников
+     *
+     * @param \Spidesu\Gosling\Model\BirthdayTask $task
+     * @param Discord $discord
+     * @param \Spidesu\Gosling\Model\Guild $guild_config
+     *
+     * @return void
+     * @throws NoPermissionsException
+     */
 	private static function _congratulateMembers(\Spidesu\Gosling\Model\BirthdayTask $task, Discord $discord, \Spidesu\Gosling\Model\Guild $guild_config):void {
 
 		$message = "Поздравляем с днем рождения🎂". PHP_EOL;

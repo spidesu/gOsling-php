@@ -5,7 +5,7 @@ services:
     env_file:
       - main.env
     volumes:
-      - /db:/var/lib/mysql
+      - F:/projects/gOsling-db:/var/lib/mysql
   gosling:
     build: .
     restart: always

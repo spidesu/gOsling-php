@@ -1,4 +1,4 @@
 #!/bin/bash
 
-envsubst < "conf/config.env.json" > "conf/config.json"
+envsubst < "/app/conf/config.env.json" > "/app/conf/config.json"
 php init.php
