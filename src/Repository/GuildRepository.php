@@ -21,13 +21,12 @@ class GuildRepository {
 		);
 
 		if (!isset($result["guild_id"])) {
-
 			throw new RowIsEmpty();
 		}
 
 		return new Guild(
 			$result["guild_id"],
-			json_decode($result["config"], true),
+			json_decode($result["config"], true, 512, JSON_THROW_ON_ERROR),
 		);
 	}
 
@@ -71,7 +70,7 @@ class GuildRepository {
 					"birthday_role"        => null,
 					"discord_support_role" => null,
 					"support_role"         => null,
-				]),
+				], JSON_THROW_ON_ERROR),
 			]
 		);
 	}
@@ -125,7 +124,7 @@ class GuildRepository {
 
 		$output = "";
 		foreach ($values as $k => $v) {
-			if (gettype($v) == "integer") {
+			if (is_int($v)) {
 				$output .= "'$.{$k}', $v, ";
 				continue;
 			}

@@ -17,6 +17,9 @@ include __DIR__ . "/vendor/autoload.php";
 const APP_DIR = __DIR__ ;
 const DB_NAME = "main";
 
+// TODO сделать нормальные миграции
+\Spidesu\Gosling\System\PDO\PDOConnector::instance()->connect(DB_NAME)->loadSql(APP_DIR . "/migration.sql", DB_NAME);
+
 $discord = new Discord([
 	'token' => Config::instance()->getDiscordBotToken(),
 	'intents' => Intents::getDefaultIntents() | Intents::GUILD_MEMBERS,
@@ -62,7 +65,11 @@ $discord->on('ready', function (Discord $discord) {
         };
         $promise = new Promise($resolver);
         $promise->done(function (array $data) {
-            if ($data["process_time"] === 0) return;
+
+            if ($data["process_time"] === 0) {
+			return;
+		}
+
             echo "Support role add/remove for member {$data["member_id"]} in guild {$data["guild_id"]} processed successfully for {$data["process_time"]}ms". PHP_EOL;
         });
     });

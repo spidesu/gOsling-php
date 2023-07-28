@@ -67,4 +67,15 @@ class PDOMain extends PDO {
 		$stmt = $this->prepare($query);
 		return $stmt->execute($args);
 	}
+
+	public function loadSql(string $file_path, string $db_name):bool {
+
+		if (!file_exists($file_path)) {
+			throw new \PDOException("sql file not exists");
+		}
+
+		$sql = file_get_contents($file_path);
+
+		return PDOConnector::instance()->connect($db_name)->exec($sql);
+	}
 }

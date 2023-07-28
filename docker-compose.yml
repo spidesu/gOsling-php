@@ -1,15 +1,15 @@
 version: "3.9"
 services:
-  mariadb-host:
-    image: "mariadb:10.7"
+  mariadb:
+    container_name: mariadb
+    image: "mariadb:11.0.2"
     env_file:
       - main.env
-    volumes:
-      - F:/projects/gOsling-db:/var/lib/mysql
   gosling:
+    container_name: gosling
     build: .
     restart: always
     depends_on:
-      - mariadb-host
+      - mariadb
     env_file:
       - main.env
